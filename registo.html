@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Gestão e Registos</title>
+    <style>
+        :root {
+            --primary: #1b4332;
+            --primary-light: #2d6a4f;
+            --accent: #52b788;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #212529;
+            --border: #e9ecef;
+            --danger: #d90429;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 12px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border); }
+        .header { background: var(--primary); color: white; padding: 16px; text-align: center; }
+        .header h1 { font-size: 1.2rem; }
+
+        .nav-tabs { display: flex; background: #e9ecef; border-bottom: 1px solid var(--border); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 700; font-size: 0.85rem; color: #495057; cursor: pointer; }
+        .tab-btn.active { background: white; color: var(--primary); border-bottom: 3px solid var(--accent); }
+
+        .content { padding: 16px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: #495057; text-transform: uppercase; }
+        select, input, button { width: 100%; padding: 10px 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid #ced4da; outline: none; }
+        
+        .btn-submit { background: var(--primary-light); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 6px; }
+        .btn-toggle { background: #e9ecef; color: var(--primary); border: 1px solid #ced4da; font-weight: 700; cursor: pointer; margin: 16px 0 10px 0; }
+        .btn-cancel { background: #6c757d; color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 4px; }
+        .btn-danger { background: var(--danger); color: white; border: none; font-weight: 700; cursor: pointer; }
+
+        .filter-box { background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-box select { font-size: 0.8rem; padding: 6px; flex: 1; min-width: 30%; }
+
+        .item-row { background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { font-size: 0.85rem; font-weight: 600; }
+        .item-actions { display: flex; gap: 6px; }
+        .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; width: auto; }
+
+        .status-msg { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: 600; display: none; }
+        .status-success { background: #d8f3dc; color: var(--primary); }
+        .status-error { background: #f8d7da; color: var(--danger); }
+        .hidden { display: none !important; }
+        .section-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin: 10px 0; padding-bottom: 4px; border-bottom: 2px solid var(--accent); text-transform: uppercase; }
+        
+        .editing-mode { background: #fff9db; border: 1px solid #ffe066; padding: 8px; border-radius: 8px; margin-bottom: 12px; text-align: center; font-size: 0.85rem; font-weight: bold; color: #856404; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>⚙️ Registo & Gestão de Cotas</h1>
+    </div>
+
+    <!-- Separadores -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tab-reg" onclick="mudarAba('registos')">💳 Pagamentos</button>
+        <button class="tab-btn" id="tab-jog" onclick="mudarAba('jogadores')">👤 Gerir Jogadores</button>
+    </div>
+
+    <div class="content">
+        <!-- SECTOR 1: FORMULÁRIO DE PAGAMENTOS -->
+        <div id="aba-registos">
+            
+            <div id="banner-edicao" class="editing-mode hidden">
+                ✏️ A Editar Registo da Linha <span id="num-linha-edicao"></span>
+            </div>
+
+            <form id="form-registo" onsubmit="guardarPagamento(event)">
+                <input type="hidden" id="linha-edicao-id" value="">
+
+                <div class="form-group">
+                    <label for="ano">Ano Lectivo / Época</label>
+                    <select id="ano" required>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="jogador">Jogador</label>
+                    <select id="jogador" required><option value="">A carregar...</option></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mes">Mês</label>
+                    <select id="mes" required>
+                        <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option><option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                        <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="obs">Observações</label>
+                    <input type="text" id="obs" placeholder="Ex: Pago por MBWay">
+                </div>
+
+                <button type="submit" class="btn-submit" id="btn-salvar">✅ Guardar Pagamento</button>
+                <button type="button" class="btn-cancel hidden" id="btn-cancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
+            </form>
+
+            <!-- BOTÃO PARA EXIBIR/OCULTAR HISTÓRICO -->
+            <button class="btn-toggle" onclick="alternarHistorico()">👁️ Mostrar / Ocultar Histórico & Edição</button>
+
+            <!-- PAINEL DE HISTÓRICO E FILTROS (INICIA ESCONDIDO) -->
+            <div id="area-historico" class="hidden">
+                <div class="section-title">🔍 Pesquisar / Filtrar Registos</div>
+                <div class="filter-box">
+                    <select id="filtro-hist-jogador" onchange="renderizarHistorico()">
+                        <option value="">Todos os Jogadores</option>
+                    </select>
+                    <select id="filtro-hist-mes" onchange="renderizarHistorico()">
+                        <option value="">Todos os Meses</option>
+                        <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option><option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                        <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                    </select>
+                    <select id="filtro-hist-ano" onchange="renderizarHistorico()">
+                        <option value="">Todos os Anos</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
+
+                <div id="lista-historico">A carregar registos...</div>
+            </div>
+        </div>
+
+        <!-- SECTOR 2: GESTÃO DE JOGADORES -->
+        <div id="aba-jogadores" class="hidden">
+            <div class="section-title">➕ Adicionar Jogador</div>
+            <div style="display:flex; gap:6px; margin-bottom:16px;">
+                <input type="text" id="novo-jogador-nome" placeholder="Nome do jogador">
+                <button class="btn-submit" style="width: auto; margin:0;" onclick="adicionarJogador()">Adicionar</button>
+            </div>
+
+            <div class="section-title">📜 Lista Atual de Jogadores</div>
+            <div id="lista-jogadores-gestao">A carregar jogadores...</div>
+        </div>
+
+        <div id="status" class="status-msg"></div>
+    </div>
+</div>
+
+<script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCJq9LqgVJZgsbHoYxOpIdUVQuHz3ofoDHyeiHKH2QhKvxyGL6pjgLDhClokX9IIUi/exec";
+
+    let dadosGlobais = null;
+
+    function mudarAba(aba) {
+        document.getElementById('tab-reg').classList.toggle('active', aba === 'registos');
+        document.getElementById('tab-jog').classList.toggle('active', aba === 'jogadores');
+        
+        document.getElementById('aba-registos').classList.toggle('hidden', aba !== 'registos');
+        document.getElementById('aba-jogadores').classList.toggle('hidden', aba !== 'jogadores');
+    }
+
+    function alternarHistorico() {
+        const area = document.getElementById('area-historico');
+        area.classList.toggle('hidden');
+        if (!area.classList.contains('hidden')) {
+            renderizarHistorico();
+        }
+    }
+
+    // FUNÇÃO QUE PREENCHE OS DROPDOWNS COM A LISTA DE JOGADORES
+    function preencherDropdownsJogadores(listaJogadores) {
+        if (!listaJogadores || listaJogadores.length === 0) return;
+
+        const selJog = document.getElementById('jogador');
+        const valorAtual = selJog.value;
+        
+        const selFiltroJog = document.getElementById('filtro-hist-jogador');
+        const valorFiltroAtual = selFiltroJog.value;
+
+        selJog.innerHTML = '<option value="">-- Selecionar Jogador --</option>';
+        selFiltroJog.innerHTML = '<option value="">Todos os Jogadores</option>';
+
+        listaJogadores.forEach(j => {
+            selJog.innerHTML += `<option value="${j}">${j}</option>`;
+            selFiltroJog.innerHTML += `<option value="${j}">${j}</option>`;
+        });
+
+        if (valorAtual) selJog.value = valorAtual;
+        if (valorFiltroAtual) selFiltroJog.value = valorFiltroAtual;
+    }
+
+    // CARREGAR DADOS (COM CACHE LOCAL INSTANTÂNEA)
+    async function carregarTudo() {
+        // 1. CARREGAR INSTANTANEAMENTE DA CACHE LOCAL (0 SEGUNDOS)
+        const cacheJogadores = localStorage.getItem('cache_jogadores');
+        if (cacheJogadores) {
+            try {
+                const listaLocal = JSON.parse(cacheJogadores);
+                preencherDropdownsJogadores(listaLocal);
+            } catch (e) { console.error("Erro na cache local", e); }
+        }
+
+        // 2. BUSCAR DADOS AO SERVIDOR EM SEGUNDO PLANO
+        try {
+            const resp = await fetch(APPS_SCRIPT_URL);
+            dadosGlobais = await resp.json();
+            
+            if (dadosGlobais.jogadores) {
+                preencherDropdownsJogadores(dadosGlobais.jogadores);
+                // Atualizar cache
+                localStorage.setItem('cache_jogadores', JSON.stringify(dadosGlobais.jogadores));
+            }
+
+            renderizarHistorico();
+            renderizarListaJogadores();
+        } catch (e) {
+            console.error("Erro ao carregar do servidor:", e);
+            if (!cacheJogadores) {
+                document.getElementById('jogador').innerHTML = '<option value="">❌ Erro ao carregar</option>';
+            }
+        }
+    }
+
+    carregarTudo();
+
+    // GUARDAR OU EDITAR PAGAMENTO
+    async function guardarPagamento(e) {
+        e.preventDefault();
+        
+        const linhaEdicao = document.getElementById('linha-edicao-id').value;
+        const ano = document.getElementById('ano').value.toString().trim();
+        const jogador = document.getElementById('jogador').value.toString().trim();
+        const mes = document.getElementById('mes').value.toString().trim();
+        const obs = document.getElementById('obs').value.toString().trim();
+
+        // VALIDAR DUPLICADO
+        if (dadosGlobais && dadosGlobais.registos) {
+            for (let i = 1; i < dadosGlobais.registos.length; i++) {
+                const r = dadosGlobais.registos[i];
+                const linhaAtual = i + 1;
+
+                if (linhaEdicao && parseInt(linhaEdicao) === linhaAtual) continue;
+
+                const rJogador = (r[1] || "").toString().trim().toLowerCase();
+                const rMes = (r[2] || "").toString().trim().toLowerCase();
+                const rAno = (r[4] || "2026").toString().trim();
+
+                if (rJogador === jogador.toLowerCase() && rMes === mes.toLowerCase() && rAno === ano) {
+                    mostrarStatus(`⚠️ O jogador ${jogador} JÁ tem o mês de ${mes}/${ano} pago!`, true);
+                    return;
+                }
+            }
+        }
+
+        const btn = document.getElementById('btn-salvar');
+        btn.disabled = true;
+
+        const payload = {
+            acao: linhaEdicao ? 'editar' : 'criar',
+            linha: linhaEdicao ? parseInt(linhaEdicao) : null,
+            ano: ano,
+            jogador: jogador,
+            mes: mes,
+            obs: obs
+        };
+
+        // 1. Guardar no Google Sheets
+        await postData(payload);
+        
+        mostrarStatus(linhaEdicao ? "✏️ Pagamento alterado!" : "✅ Pagamento guardado!");
+
+        // 2. Abrir o WhatsApp para partilhar no Grupo (Apenas em novos registos)
+        if (!linhaEdicao) {
+            const mensagem = `Recebido ${jogador} - ${mes}/${ano}`;
+            const urlWhatsapp = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+            
+            window.open(urlWhatsapp, '_blank');
+        }
+
+        cancelarEdicao();
+        btn.disabled = false;
+        await carregarTudo();
+    }
+
+    function prepararEdicao(linha, jog, mes, ano, obs) {
+        document.getElementById('linha-edicao-id').value = linha;
+        document.getElementById('num-linha-edicao').innerText = linha;
+        
+        document.getElementById('ano').value = ano;
+        document.getElementById('jogador').value = jog;
+        document.getElementById('mes').value = mes;
+        document.getElementById('obs').value = obs;
+
+        document.getElementById('banner-edicao').classList.remove('hidden');
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        document.getElementById('btn-salvar').innerText = "🔄 Atualizar Pagamento";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('linha-edicao-id').value = "";
+        document.getElementById('obs').value = "";
+        document.getElementById('banner-edicao').classList.add('hidden');
+        document.getElementById('btn-cancelar').classList.add('hidden');
+        document.getElementById('btn-salvar').innerText = "✅ Guardar Pagamento";
+    }
+
+    async function eliminarPagamento(linha) {
+        if (confirm("Deseja eliminar permanentemente este registo?")) {
+            await postData({ acao: 'eliminar', linha: linha });
+            mostrarStatus("🗑️ Registo eliminado!");
+            await carregarTudo();
+        }
+    }
+
+    // RENDERIZAR HISTÓRICO COM FILTROS
+    function renderizarHistorico() {
+        const cont = document.getElementById('lista-historico');
+        if (!dadosGlobais || !dadosGlobais.registos || dadosGlobais.registos.length <= 1) {
+            cont.innerHTML = '<i>Nenhum registo efetuado.</i>';
+            return;
+        }
+
+        const fJogador = document.getElementById('filtro-hist-jogador').value.toLowerCase();
+        const fMes = document.getElementById('filtro-hist-mes').value.toLowerCase();
+        const fAno = document.getElementById('filtro-hist-ano').value;
+
+        cont.innerHTML = '';
+        let encontrados = 0;
+
+        for (let i = dadosGlobais.registos.length - 1; i >= 1; i--) {
+            const r = dadosGlobais.registos[i];
+            const linhaReal = i + 1;
+
+            const jogReg = (r[1] || "").toString();
+            const mesReg = (r[2] || "").toString();
+            const anoReg = (r[4] || "2026").toString();
+            const obsReg = (r[3] || "").toString();
+
+            // Aplicação dos Filtros
+            if (fJogador && jogReg.toLowerCase() !== fJogador) continue;
+            if (fMes && mesReg.toLowerCase() !== fMes) continue;
+            if (fAno && anoReg !== fAno) continue;
+
+            encontrados++;
+
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <div class="item-info">
+                    <b>${jogReg}</b><br>
+                    <small>${mesReg} / ${anoReg} ${obsReg ? '- <i>'+obsReg+'</i>' : ''}</small>
+                </div>
+                <div class="item-actions">
+                    <button class="btn-submit btn-sm" onclick="prepararEdicao(${linhaReal}, '${jogReg}', '${mesReg}', '${anoReg}', '${obsReg}')">✏️ Editar</button>
+                    <button class="btn-danger btn-sm" onclick="eliminarPagamento(${linhaReal})">🗑️</button>
+                </div>
+            `;
+            cont.appendChild(div);
+        }
+
+        if (encontrados === 0) {
+            cont.innerHTML = '<i>Nenhum registo corresponde aos filtros.</i>';
+        }
+    }
+
+    async function adicionarJogador() {
+        const input = document.getElementById('novo-jogador-nome');
+        const nome = input.value.trim();
+        if (!nome) return;
+
+        await postData({ acao: 'add_jogador', nome: nome });
+        input.value = '';
+        mostrarStatus("👤 Jogador adicionado!");
+        await carregarTudo();
+    }
+
+    async function eliminarJogador(nome) {
+        if (confirm(`Tem a certeza que deseja remover ${nome}?`)) {
+            await postData({ acao: 'del_jogador', nome: nome });
+            mostrarStatus("🗑️ Jogador removido!");
+            await carregarTudo();
+        }
+    }
+
+    function renderizarListaJogadores() {
+        const cont = document.getElementById('lista-jogadores-gestao');
+        if (!dadosGlobais || !dadosGlobais.jogadores || dadosGlobais.jogadores.length === 0) {
+            cont.innerHTML = '<i>Nenhum jogador registado.</i>';
+            return;
+        }
+
+        cont.innerHTML = '';
+        dadosGlobais.jogadores.forEach(j => {
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <span class="item-info">👤 ${j}</span>
+                <button class="btn-danger btn-sm" onclick="eliminarJogador('${j}')">🗑️ Eliminar</button>
+            `;
+            cont.appendChild(div);
+        });
+    }
+
+    async function postData(payload) {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    }
+
+    function mostrarStatus(msg, eErro = false) {
+        const s = document.getElementById('status');
+        s.className = 'status-msg ' + (eErro ? 'status-error' : 'status-success');
+        s.innerText = msg;
+        s.style.display = 'block';
+        setTimeout(() => s.style.display = 'none', 3500);
+    }
+</script>
+
+</body>
+</html>
