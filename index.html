@@ -180,16 +180,6 @@
             <label for="filtro-jogador">Escolher Jogador</label>
             <select id="filtro-jogador" onchange="consultar()">
                 <option value="">-- Selecione o Jogador --</option>
-                <option value="Benjamim">Benjamim</option>
-                <option value="Brito">Brito</option>
-                <option value="Bruno">Bruno</option>
-                <option value="David">David</option>
-                <option value="Greg">Greg</option>
-                <option value="Hugo">Hugo</option>
-                <option value="Ideias">Ideias</option>
-                <option value="Rui">Rui</option>
-                <option value="Tiago Xu">Tiago Xu</option>
-                <option value="Zé Prof">Zé Prof</option>
             </select>
         </div>
 
@@ -222,22 +212,10 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSB8DaO_ngTrRbhsjsWU39J8-dBt5ypFgcpVBx6j0fE7lsG0VzNKLvkO5kgwBI34t-/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXxiNjOKMfrvtQvSIoRgoHRy8AKK3C0V2qHUCGrNXpHbenGQ-youHlmQ3Q8HtB6u2M/exec";
 
     let dadosCache = null;
     let jogadoresGlobais = [];
-
-    // Guarda e ordena a lista local de jogadores estáticos
-    function extrairJogadoresIniciais() {
-        const select = document.getElementById('filtro-jogador');
-        if (!select) return;
-        
-        jogadoresGlobais = Array.from(select.options)
-            .map(opt => opt.value)
-            .filter(val => val !== "");
-            
-        renderizarDropdownJogadores();
-    }
 
     // Atualiza a interface com a lista completa ordenada por ordem alfabética
     function renderizarDropdownJogadores() {
@@ -273,17 +251,17 @@
             const registos = data.registos ? data.registos : (Array.isArray(data) ? data : []);
             dadosCache = registos;
 
-            // Extrai jogadores enviados pela chave "jogadores" do Apps Script
+            // 1. Adiciona jogadores recebidos da aba "Jogadores" no Google Sheets
             if (data.jogadores && Array.isArray(data.jogadores)) {
                 jogadoresGlobais = jogadoresGlobais.concat(data.jogadores);
             }
 
-            // Extrai jogadores que já tenham registos na tabela
+            // 2. Adiciona jogadores que já tenham registos na tabela (por segurança)
             for (let i = 1; i < registos.length; i++) {
                 if (registos[i][1]) jogadoresGlobais.push(registos[i][1]);
             }
 
-            // Re-renderiza a lista final ordenada
+            // Renderiza a lista no dropdown
             renderizarDropdownJogadores();
             return true;
         } catch (e) {
@@ -293,8 +271,7 @@
         }
     }
 
-    // Inicialização
-    extrairJogadoresIniciais();
+    // Inicialização ao carregar a página
     carregarDados();
 
     function alterarModoBusca() {
