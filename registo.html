@@ -183,6 +183,8 @@
     // FUNÇÃO QUE PREENCHE OS DROPDOWNS COM A LISTA DE JOGADORES
     function preencherDropdownsJogadores(listaJogadores) {
         if (!listaJogadores || listaJogadores.length === 0) return;
+// 🔤 Ordena a lista de jogadores por ordem alfabética
+    listaJogadores.sort((a, b) => a.localeCompare(b, 'pt'));
 
         const selJog = document.getElementById('jogador');
         const valorAtual = selJog.value;
