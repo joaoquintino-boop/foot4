@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamentos foot4</title>
+    <title>Painel de Gestão e Registos</title>
     <style>
         :root {
             --primary: #1b4332;
@@ -13,405 +13,426 @@
             --card-bg: #ffffff;
             --text: #212529;
             --border: #e9ecef;
+            --danger: #d90429;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 12px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid var(--border); }
+        .header { background: var(--primary); color: white; padding: 16px; text-align: center; }
+        .header h1 { font-size: 1.2rem; }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 12px;
-            display: flex;
-            justify-content: center;
-        }
+        .nav-tabs { display: flex; background: #e9ecef; border-bottom: 1px solid var(--border); }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: none; font-weight: 700; font-size: 0.85rem; color: #495057; cursor: pointer; }
+        .tab-btn.active { background: white; color: var(--primary); border-bottom: 3px solid var(--accent); }
 
-        .container {
-            width: 100%;
-            max-width: 440px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
+        .content { padding: 16px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: #495057; text-transform: uppercase; }
+        select, input, button { width: 100%; padding: 10px 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid #ced4da; outline: none; }
+        
+        .btn-submit { background: var(--primary-light); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 6px; }
+        .btn-toggle { background: #e9ecef; color: var(--primary); border: 1px solid #ced4da; font-weight: 700; cursor: pointer; margin: 16px 0 10px 0; }
+        .btn-cancel { background: #6c757d; color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 4px; }
+        .btn-danger { background: var(--danger); color: white; border: none; font-weight: 700; cursor: pointer; }
 
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 20px 16px;
-            text-align: center;
-        }
+        .filter-box { background: #e8f5e9; padding: 10px; border-radius: 8px; margin-bottom: 12px; display: flex; gap: 6px; flex-wrap: wrap; }
+        .filter-box select { font-size: 0.8rem; padding: 6px; flex: 1; min-width: 30%; }
 
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
+        .item-row { background: #f8f9fa; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { font-size: 0.85rem; font-weight: 600; }
+        .item-actions { display: flex; gap: 6px; }
+        .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; width: auto; }
 
-        .header p {
-            font-size: 0.85rem;
-            opacity: 0.85;
-            margin-top: 4px;
-        }
-
-        .content {
-            padding: 20px 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: #495057;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        select {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 1rem;
-            border-radius: 10px;
-            border: 1px solid #ced4da;
-            outline: none;
-            background-color: #fff;
-        }
-
-        select:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.25);
-        }
-
-        .result-card {
-            background: #f1f8f5;
-            border-left: 4px solid var(--accent);
-            padding: 16px;
-            border-radius: 10px;
-            margin-top: 16px;
-            min-height: 100px;
-        }
-
-        .result-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
-
-        .badge-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .badge {
-            background: var(--accent);
-            color: white;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .badge-obs {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            font-weight: normal;
-        }
-
-        .empty-msg {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-style: italic;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 10px;
-            color: var(--primary-light);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .hidden {
-            display: none !important;
-        }
+        .status-msg { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: 600; display: none; }
+        .status-success { background: #d8f3dc; color: var(--primary); }
+        .status-error { background: #f8d7da; color: var(--danger); }
+        .hidden { display: none !important; }
+        .section-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin: 10px 0; padding-bottom: 4px; border-bottom: 2px solid var(--accent); text-transform: uppercase; }
+        
+        .editing-mode { background: #fff9db; border: 1px solid #ffe066; padding: 8px; border-radius: 8px; margin-bottom: 12px; text-align: center; font-size: 0.85rem; font-weight: bold; color: #856404; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h1>Pagamentos foot4</h1>
-        <p>Consulta</p>
+        <h1>⚙️ Registo & Gestão de Cotas</h1>
+    </div>
+
+    <!-- Separadores -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tab-reg" onclick="mudarAba('registos')">💳 Pagamentos</button>
+        <button class="tab-btn" id="tab-jog" onclick="mudarAba('jogadores')">👤 Gerir Jogadores</button>
     </div>
 
     <div class="content">
-        <div class="form-group">
-            <label for="filtro-ano">Ano Lectivo / Época</label>
-            <select id="filtro-ano" onchange="consultar()">
-                <option value="2026" selected>2026</option>
-                <option value="2027">2027</option>
-                <option value="2028">2028</option>
-            </select>
-        </div>
+        <!-- SECTOR 1: FORMULÁRIO DE PAGAMENTOS -->
+        <div id="aba-registos">
+            
+            <div id="banner-edicao" class="editing-mode hidden">
+                ✏️ A Editar Registo da Linha <span id="num-linha-edicao"></span>
+            </div>
 
-        <div class="form-group">
-            <label for="busca-tipo">Modo de Consulta</label>
-            <select id="busca-tipo" onchange="alterarModoBusca()">
-                <option value="jogador" selected>Por Jogador (Ver Meses Pagos)</option>
-                <option value="mes">Por Mês (Ver Quem Pagou)</option>
-            </select>
-        </div>
+            <form id="form-registo" onsubmit="guardarPagamento(event)">
+                <input type="hidden" id="linha-edicao-id" value="">
 
-        <div class="form-group" id="group-filtro-jogador">
-            <label for="filtro-jogador">Escolher Jogador</label>
-            <select id="filtro-jogador" onchange="consultar()">
-                <option value="">-- Selecione o Jogador --</option>
-                <option value="Benjamim">Benjamim</option>
-                <option value="Brito">Brito</option>
-                <option value="Bruno">Bruno</option>
-                <option value="David">David</option>
-                <option value="Greg">Greg</option>
-                <option value="Hugo">Hugo</option>
-                <option value="Ideias">Ideias</option>
-                <option value="Rui">Rui</option>
-                <option value="Tiago Xu">Tiago Xu</option>
-                <option value="Zé Prof">Zé Prof</option>
-            </select>
-        </div>
+                <div class="form-group">
+                    <label for="ano">Ano Lectivo / Época</label>
+                    <select id="ano" required>
+                        <option value="2026" selected>2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
 
-        <div class="form-group hidden" id="group-filtro-mes">
-            <label for="filtro-mes">Escolher Mês</label>
-            <select id="filtro-mes" onchange="consultar()">
-                <option value="">-- Selecione o Mês --</option>
-                <option value="Janeiro">Janeiro</option>
-                <option value="Fevereiro">Fevereiro</option>
-                <option value="Março">Março</option>
-                <option value="Abril">Abril</option>
-                <option value="Maio">Maio</option>
-                <option value="Junho">Junho</option>
-                <option value="Julho">Julho</option>
-                <option value="Agosto">Agosto</option>
-                <option value="Setembro">Setembro</option>
-                <option value="Outubro">Outubro</option>
-                <option value="Novembro">Novembro</option>
-                <option value="Dezembro">Dezembro</option>
-            </select>
-        </div>
+                <div class="form-group">
+                    <label for="jogador">Jogador</label>
+                    <select id="jogador" required><option value="">A carregar...</option></select>
+                </div>
 
-        <div class="result-card">
-            <div class="result-title" id="resultado-titulo">Selecione uma opção acima</div>
-            <div id="resultado-conteudo" class="badge-list">
-                <span class="empty-msg">A aguardar seleção...</span>
+                <div class="form-group">
+                    <label for="mes">Mês</label>
+                    <select id="mes" required>
+                        <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option><option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                        <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="obs">Observações</label>
+                    <input type="text" id="obs" placeholder="Ex: Pago por MBWay">
+                </div>
+
+                <button type="submit" class="btn-submit" id="btn-salvar">✅ Guardar Pagamento</button>
+                <button type="button" class="btn-cancel hidden" id="btn-cancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
+            </form>
+
+            <!-- BOTÃO PARA EXIBIR/OCULTAR HISTÓRICO -->
+            <button class="btn-toggle" onclick="alternarHistorico()">👁️ Mostrar / Ocultar Histórico & Edição</button>
+
+            <!-- PAINEL DE HISTÓRICO E FILTROS (INICIA ESCONDIDO) -->
+            <div id="area-historico" class="hidden">
+                <div class="section-title">🔍 Pesquisar / Filtrar Registos</div>
+                <div class="filter-box">
+                    <select id="filtro-hist-jogador" onchange="renderizarHistorico()">
+                        <option value="">Todos os Jogadores</option>
+                    </select>
+                    <select id="filtro-hist-mes" onchange="renderizarHistorico()">
+                        <option value="">Todos os Meses</option>
+                        <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                        <option value="Março">Março</option><option value="Abril">Abril</option>
+                        <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                        <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                        <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                        <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                    </select>
+                    <select id="filtro-hist-ano" onchange="renderizarHistorico()">
+                        <option value="">Todos os Anos</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                    </select>
+                </div>
+
+                <div id="lista-historico">A carregar registos...</div>
             </div>
         </div>
+
+        <!-- SECTOR 2: GESTÃO DE JOGADORES -->
+        <div id="aba-jogadores" class="hidden">
+            <div class="section-title">➕ Adicionar Jogador</div>
+            <div style="display:flex; gap:6px; margin-bottom:16px;">
+                <input type="text" id="novo-jogador-nome" placeholder="Nome do jogador">
+                <button class="btn-submit" style="width: auto; margin:0;" onclick="adicionarJogador()">Adicionar</button>
+            </div>
+
+            <div class="section-title">📜 Lista Atual de Jogadores</div>
+            <div id="lista-jogadores-gestao">A carregar jogadores...</div>
+        </div>
+
+        <div id="status" class="status-msg"></div>
     </div>
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSB8DaO_ngTrRbhsjsWU39J8-dBt5ypFgcpVBx6j0fE7lsG0VzNKLvkO5kgwBI34t-/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCJq9LqgVJZgsbHoYxOpIdUVQuHz3ofoDHyeiHKH2QhKvxyGL6pjgLDhClokX9IIUi/exec";
 
-    let dadosCache = null;
+    let dadosGlobais = null;
 
-    // Atualiza a lista de seleção garantindo ordenação alfabética
-    function atualizarDropdownJogadores(listaJogadores) {
-        const select = document.getElementById('filtro-jogador');
-        if (!select) return;
+    function mudarAba(aba) {
+        document.getElementById('tab-reg').classList.toggle('active', aba === 'registos');
+        document.getElementById('tab-jog').classList.toggle('active', aba === 'jogadores');
+        
+        document.getElementById('aba-registos').classList.toggle('hidden', aba !== 'registos');
+        document.getElementById('aba-jogadores').classList.toggle('hidden', aba !== 'jogadores');
+    }
 
-        const valorAtual = select.value;
-        let jogadores = listaJogadores;
-
-        // Se não vier lista do servidor, usa as opções estáticas do HTML
-        if (!jogadores || jogadores.length === 0) {
-            jogadores = Array.from(select.options)
-                .map(opt => opt.value)
-                .filter(val => val !== "");
+    function alternarHistorico() {
+        const area = document.getElementById('area-historico');
+        area.classList.toggle('hidden');
+        if (!area.classList.contains('hidden')) {
+            renderizarHistorico();
         }
+    }
 
-        // Remove duplicados e ordena alfabeticamente (com suporte a acentos)
-        jogadores = [...new Set(jogadores)];
-        jogadores.sort((a, b) => a.localeCompare(b, 'pt'));
+    // FUNÇÃO QUE PREENCHE OS DROPDOWNS COM A LISTA DE JOGADORES
+    function preencherDropdownsJogadores(listaJogadores) {
+        if (!listaJogadores || listaJogadores.length === 0) return;
+// 🔤 Ordena a lista de jogadores por ordem alfabética
+    listaJogadores.sort((a, b) => a.localeCompare(b, 'pt'));
 
-        select.innerHTML = '<option value="">-- Selecione o Jogador --</option>';
-        jogadores.forEach(j => {
-            select.innerHTML += `<option value="${j}">${j}</option>`;
+        const selJog = document.getElementById('jogador');
+        const valorAtual = selJog.value;
+        
+        const selFiltroJog = document.getElementById('filtro-hist-jogador');
+        const valorFiltroAtual = selFiltroJog.value;
+
+        selJog.innerHTML = '<option value="">-- Selecionar Jogador --</option>';
+        selFiltroJog.innerHTML = '<option value="">Todos os Jogadores</option>';
+
+        listaJogadores.forEach(j => {
+            selJog.innerHTML += `<option value="${j}">${j}</option>`;
+            selFiltroJog.innerHTML += `<option value="${j}">${j}</option>`;
         });
 
-        if (valorAtual) select.value = valorAtual;
+        if (valorAtual) selJog.value = valorAtual;
+        if (valorFiltroAtual) selFiltroJog.value = valorFiltroAtual;
     }
 
-    async function carregarDados() {
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("COLE_AQUI")) return false;
-        if (dadosCache) return true;
+    // CARREGAR DADOS (COM CACHE LOCAL INSTANTÂNEA)
+    async function carregarTudo() {
+        // 1. CARREGAR INSTANTANEAMENTE DA CACHE LOCAL (0 SEGUNDOS)
+        const cacheJogadores = localStorage.getItem('cache_jogadores');
+        if (cacheJogadores) {
+            try {
+                const listaLocal = JSON.parse(cacheJogadores);
+                preencherDropdownsJogadores(listaLocal);
+            } catch (e) { console.error("Erro na cache local", e); }
+        }
 
+        // 2. BUSCAR DADOS AO SERVIDOR EM SEGUNDO PLANO
         try {
             const resp = await fetch(APPS_SCRIPT_URL);
-            if (!resp.ok) throw new Error("Falha na rede");
-            const data = await resp.json();
+            dadosGlobais = await resp.json();
             
-            let registos = data.registos ? data.registos : data;
-            dadosCache = registos;
-
-            // Tenta obter lista de jogadores pelo array 'jogadores' ou extrai dos registos
-            let listaJogadores = data.jogadores || [];
-            if (listaJogadores.length === 0 && Array.isArray(registos)) {
-                for (let i = 1; i < registos.length; i++) {
-                    if (registos[i][1]) listaJogadores.push(registos[i][1]);
-                }
+            if (dadosGlobais.jogadores) {
+                preencherDropdownsJogadores(dadosGlobais.jogadores);
+                // Atualizar cache
+                localStorage.setItem('cache_jogadores', JSON.stringify(dadosGlobais.jogadores));
             }
 
-            if (listaJogadores.length > 0) {
-                atualizarDropdownJogadores(listaJogadores);
-            }
-
-            return true;
+            renderizarHistorico();
+            renderizarListaJogadores();
         } catch (e) {
-            console.error("Erro ao carregar dados:", e);
-            // Em caso de erro de rede, garante pelo menos a ordenação da lista local
-            atualizarDropdownJogadores();
-            return false;
+            console.error("Erro ao carregar do servidor:", e);
+            if (!cacheJogadores) {
+                document.getElementById('jogador').innerHTML = '<option value="">❌ Erro ao carregar</option>';
+            }
         }
     }
 
-    // Inicializa a ordenação imediatamente na lista local e carrega o servidor em background
-    atualizarDropdownJogadores();
-    carregarDados();
+    carregarTudo();
 
-    function alterarModoBusca() {
-        const modo = document.getElementById('busca-tipo').value;
-        const groupJog = document.getElementById('group-filtro-jogador');
-        const groupMes = document.getElementById('group-filtro-mes');
+    // GUARDAR OU EDITAR PAGAMENTO
+    async function guardarPagamento(e) {
+        e.preventDefault();
         
-        document.getElementById('filtro-jogador').value = "";
-        document.getElementById('filtro-mes').value = "";
+        const linhaEdicao = document.getElementById('linha-edicao-id').value;
+        const ano = document.getElementById('ano').value.toString().trim();
+        const jogador = document.getElementById('jogador').value.toString().trim();
+        const mes = document.getElementById('mes').value.toString().trim();
+        const obs = document.getElementById('obs').value.toString().trim();
 
-        if (modo === 'jogador') {
-            groupJog.classList.remove('hidden');
-            groupMes.classList.add('hidden');
-        } else {
-            groupJog.classList.add('hidden');
-            groupMes.classList.remove('hidden');
+        // VALIDAR DUPLICADO
+        if (dadosGlobais && dadosGlobais.registos) {
+            for (let i = 1; i < dadosGlobais.registos.length; i++) {
+                const r = dadosGlobais.registos[i];
+                const linhaAtual = i + 1;
+
+                if (linhaEdicao && parseInt(linhaEdicao) === linhaAtual) continue;
+
+                const rJogador = (r[1] || "").toString().trim().toLowerCase();
+                const rMes = (r[2] || "").toString().trim().toLowerCase();
+                const rAno = (r[4] || "2026").toString().trim();
+
+                if (rJogador === jogador.toLowerCase() && rMes === mes.toLowerCase() && rAno === ano) {
+                    mostrarStatus(`⚠️ O jogador ${jogador} JÁ tem o mês de ${mes}/${ano} pago!`, true);
+                    return;
+                }
+            }
         }
+
+        const btn = document.getElementById('btn-salvar');
+        btn.disabled = true;
+
+        const payload = {
+            acao: linhaEdicao ? 'editar' : 'criar',
+            linha: linhaEdicao ? parseInt(linhaEdicao) : null,
+            ano: ano,
+            jogador: jogador,
+            mes: mes,
+            obs: obs
+        };
+
+        // 1. Guardar no Google Sheets
+        await postData(payload);
         
-        consultar();
+        mostrarStatus(linhaEdicao ? "✏️ Pagamento alterado!" : "✅ Pagamento guardado!");
+
+        // 2. Abrir o WhatsApp para partilhar no Grupo (Apenas em novos registos)
+        if (!linhaEdicao) {
+            const mensagem = `Recebido ${jogador} - ${mes}/${ano}`;
+            const urlWhatsapp = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
+            
+            window.open(urlWhatsapp, '_blank');
+        }
+
+        cancelarEdicao();
+        btn.disabled = false;
+        await carregarTudo();
     }
 
-    async function consultar() {
-        const modo = document.getElementById('busca-tipo').value;
-        const anoSel = document.getElementById('filtro-ano').value.toString().trim();
-        const titulo = document.getElementById('resultado-titulo');
-        const conteudo = document.getElementById('resultado-conteudo');
+    function prepararEdicao(linha, jog, mes, ano, obs) {
+        document.getElementById('linha-edicao-id').value = linha;
+        document.getElementById('num-linha-edicao').innerText = linha;
         
-        conteudo.innerHTML = '';
+        document.getElementById('ano').value = ano;
+        document.getElementById('jogador').value = jog;
+        document.getElementById('mes').value = mes;
+        document.getElementById('obs').value = obs;
 
-        if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("COLE_AQUI")) {
-            titulo.innerText = 'Aviso';
-            conteudo.innerHTML = '<span class="empty-msg">Substitua o APPS_SCRIPT_URL no código.</span>';
+        document.getElementById('banner-edicao').classList.remove('hidden');
+        document.getElementById('btn-cancelar').classList.remove('hidden');
+        document.getElementById('btn-salvar').innerText = "🔄 Atualizar Pagamento";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelarEdicao() {
+        document.getElementById('linha-edicao-id').value = "";
+        document.getElementById('obs').value = "";
+        document.getElementById('banner-edicao').classList.add('hidden');
+        document.getElementById('btn-cancelar').classList.add('hidden');
+        document.getElementById('btn-salvar').innerText = "✅ Guardar Pagamento";
+    }
+
+    async function eliminarPagamento(linha) {
+        if (confirm("Deseja eliminar permanentemente este registo?")) {
+            await postData({ acao: 'eliminar', linha: linha });
+            mostrarStatus("🗑️ Registo eliminado!");
+            await carregarTudo();
+        }
+    }
+
+    // RENDERIZAR HISTÓRICO COM FILTROS
+    function renderizarHistorico() {
+        const cont = document.getElementById('lista-historico');
+        if (!dadosGlobais || !dadosGlobais.registos || dadosGlobais.registos.length <= 1) {
+            cont.innerHTML = '<i>Nenhum registo efetuado.</i>';
             return;
         }
 
-        if (!dadosCache) {
-            conteudo.innerHTML = '<span class="loading">⏳ A carregar dados...</span>';
-            const sucesso = await carregarDados();
-            if (!sucesso) {
-                titulo.innerText = 'Erro de Ligação';
-                conteudo.innerHTML = '<span class="empty-msg" style="color:#d90429;">Não foi possível carregar os dados. Verifique as permissões do Apps Script.</span>';
-                return;
-            }
-            conteudo.innerHTML = '';
+        const fJogador = document.getElementById('filtro-hist-jogador').value.toLowerCase();
+        const fMes = document.getElementById('filtro-hist-mes').value.toLowerCase();
+        const fAno = document.getElementById('filtro-hist-ano').value;
+
+        cont.innerHTML = '';
+        let encontrados = 0;
+
+        for (let i = dadosGlobais.registos.length - 1; i >= 1; i--) {
+            const r = dadosGlobais.registos[i];
+            const linhaReal = i + 1;
+
+            const jogReg = (r[1] || "").toString();
+            const mesReg = (r[2] || "").toString();
+            const anoReg = (r[4] || "2026").toString();
+            const obsReg = (r[3] || "").toString();
+
+            // Aplicação dos Filtros
+            if (fJogador && jogReg.toLowerCase() !== fJogador) continue;
+            if (fMes && mesReg.toLowerCase() !== fMes) continue;
+            if (fAno && anoReg !== fAno) continue;
+
+            encontrados++;
+
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <div class="item-info">
+                    <b>${jogReg}</b><br>
+                    <small>${mesReg} / ${anoReg} ${obsReg ? '- <i>'+obsReg+'</i>' : ''}</small>
+                </div>
+                <div class="item-actions">
+                    <button class="btn-submit btn-sm" onclick="prepararEdicao(${linhaReal}, '${jogReg}', '${mesReg}', '${anoReg}', '${obsReg}')">✏️ Editar</button>
+                    <button class="btn-danger btn-sm" onclick="eliminarPagamento(${linhaReal})">🗑️</button>
+                </div>
+            `;
+            cont.appendChild(div);
         }
 
-        const formatar = (str) => (str || "").toString().trim().toLowerCase();
+        if (encontrados === 0) {
+            cont.innerHTML = '<i>Nenhum registo corresponde aos filtros.</i>';
+        }
+    }
 
-        if (!dadosCache || dadosCache.length <= 1) {
-            conteudo.innerHTML = '<span class="empty-msg">Não há registos na folha.</span>';
+    async function adicionarJogador() {
+        const input = document.getElementById('novo-jogador-nome');
+        const nome = input.value.trim();
+        if (!nome) return;
+
+        await postData({ acao: 'add_jogador', nome: nome });
+        input.value = '';
+        mostrarStatus("👤 Jogador adicionado!");
+        await carregarTudo();
+    }
+
+    async function eliminarJogador(nome) {
+        if (confirm(`Tem a certeza que deseja remover ${nome}?`)) {
+            await postData({ acao: 'del_jogador', nome: nome });
+            mostrarStatus("🗑️ Jogador removido!");
+            await carregarTudo();
+        }
+    }
+
+    function renderizarListaJogadores() {
+        const cont = document.getElementById('lista-jogadores-gestao');
+        if (!dadosGlobais || !dadosGlobais.jogadores || dadosGlobais.jogadores.length === 0) {
+            cont.innerHTML = '<i>Nenhum jogador registado.</i>';
             return;
         }
 
-        if (modo === 'jogador') {
-            const jog = document.getElementById('filtro-jogador').value;
-            if (!jog) {
-                titulo.innerText = 'Selecione um jogador';
-                conteudo.innerHTML = '<span class="empty-msg">Escolha o jogador na lista acima.</span>';
-                return;
-            }
-            titulo.innerText = `Meses pagos por ${jog} em ${anoSel}:`;
+        cont.innerHTML = '';
+        dadosGlobais.jogadores.forEach(j => {
+            const div = document.createElement('div');
+            div.className = 'item-row';
+            div.innerHTML = `
+                <span class="item-info">👤 ${j}</span>
+                <button class="btn-danger btn-sm" onclick="eliminarJogador('${j}')">🗑️ Eliminar</button>
+            `;
+            cont.appendChild(div);
+        });
+    }
 
-            let resultados = [];
+    async function postData(payload) {
+        await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+    }
 
-            for (let i = 1; i < dadosCache.length; i++) {
-                const row = dadosCache[i];
-                const nomeSheet = formatar(row[1]);
-                const mesSheet = row[2];
-                const obsSheet = row[3] || "";
-                const anoSheet = row[4] ? row[4].toString().trim() : "";
-
-                if (nomeSheet === formatar(jog) && (anoSheet === anoSel || anoSheet === "")) {
-                    resultados.push({ mes: mesSheet, obs: obsSheet });
-                }
-            }
-
-            if (resultados.length === 0) {
-                conteudo.innerHTML = `<span class="empty-msg">Sem pagamentos registados para ${anoSel}.</span>`;
-            } else {
-                resultados.forEach(r => {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge';
-                    let txt = `✅ ${r.mes}`;
-                    if (r.obs) txt += ` <span class="badge-obs">(${r.obs})</span>`;
-                    badge.innerHTML = txt;
-                    conteudo.appendChild(badge);
-                });
-            }
-
-        } else {
-            const mes = document.getElementById('filtro-mes').value;
-            if (!mes) {
-                titulo.innerText = 'Selecione um mês';
-                conteudo.innerHTML = '<span class="empty-msg">Escolha o mês na lista acima.</span>';
-                return;
-            }
-            titulo.innerText = `Jogadores que pagaram em ${mes} de ${anoSel}:`;
-
-            let jogadoresPagos = [];
-
-            for (let i = 1; i < dadosCache.length; i++) {
-                const row = dadosCache[i];
-                const nomeSheet = row[1];
-                const mesSheet = formatar(row[2]);
-                const anoSheet = row[4] ? row[4].toString().trim() : "";
-
-                if (mesSheet === formatar(mes) && (anoSheet === anoSel || anoSheet === "")) {
-                    if (nomeSheet) jogadoresPagos.push(nomeSheet);
-                }
-            }
-
-            jogadoresPagos.sort((a, b) => a.localeCompare(b, 'pt'));
-
-            if (jogadoresPagos.length === 0) {
-                conteudo.innerHTML = `<span class="empty-msg">Nenhum jogador pagou em ${mes} de ${anoSel}.</span>`;
-            } else {
-                jogadoresPagos.forEach(j => {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge';
-                    badge.innerText = `👤 ${j}`;
-                    conteudo.appendChild(badge);
-                });
-            }
-        }
+    function mostrarStatus(msg, eErro = false) {
+        const s = document.getElementById('status');
+        s.className = 'status-msg ' + (eErro ? 'status-error' : 'status-success');
+        s.innerText = msg;
+        s.style.display = 'block';
+        setTimeout(() => s.style.display = 'none', 3500);
     }
 </script>
 
