@@ -179,7 +179,7 @@
         <div class="form-group" id="group-filtro-jogador">
             <label for="filtro-jogador">Escolher Jogador</label>
             <select id="filtro-jogador" onchange="consultar()">
-                <option value="">⏳ A carregar jogadores...</option>
+                <option value="">-- Selecione o Jogador --</option>
             </select>
         </div>
 
@@ -212,28 +212,20 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbXXiNjOKMfrvtQvSIoRgoHRy8AKK3C0V2qHUCGrNXpHbenGQ-youHlmQ3Q8HtB6u2M/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxXxiNjOKMfrvtQvSIoRgoHRy8AKK3C0V2qHUCGrNXpHbenGQ-youHlmQ3Q8HtB6u2M/exec";
 
     let dadosCache = null;
     let jogadoresGlobais = [];
 
-    // Renderiza a lista de jogadores no dropdown
-    function renderizarDropdownJogadores(erro = false) {
+    // Atualiza a interface com a lista completa ordenada por ordem alfabética
+    function renderizarDropdownJogadores() {
         const select = document.getElementById('filtro-jogador');
         if (!select) return;
 
-        if (erro) {
-            select.innerHTML = '<option value="">❌ Erro ao carregar jogadores</option>';
-            return;
-        }
-
         const valorAtual = select.value;
 
-        // Limpa espaços e valores vazios, elimina duplicados e ordena com acentos em PT
-        const unicos = [...new Set(jogadoresGlobais)]
-            .map(j => (j || "").toString().trim())
-            .filter(j => j !== "");
-
+        // Elimina duplicados e ordena alfabeticamente considerando acentos
+        const unicos = [...new Set(jogadoresGlobais)];
         unicos.sort((a, b) => a.localeCompare(b, 'pt'));
 
         select.innerHTML = '<option value="">-- Selecione o Jogador --</option>';
@@ -259,26 +251,27 @@
             const registos = data.registos ? data.registos : (Array.isArray(data) ? data : []);
             dadosCache = registos;
 
-            // 1. Adiciona jogadores da aba "Jogadores" no Google Sheets
+            // 1. Adiciona jogadores recebidos da aba "Jogadores" no Google Sheets
             if (data.jogadores && Array.isArray(data.jogadores)) {
                 jogadoresGlobais = jogadoresGlobais.concat(data.jogadores);
             }
 
-            // 2. Adiciona jogadores com registos efetuados (por prevenção)
+            // 2. Adiciona jogadores que já tenham registos na tabela (por segurança)
             for (let i = 1; i < registos.length; i++) {
                 if (registos[i][1]) jogadoresGlobais.push(registos[i][1]);
             }
 
+            // Renderiza a lista no dropdown
             renderizarDropdownJogadores();
             return true;
         } catch (e) {
             console.error("Erro ao carregar dados:", e);
-            renderizarDropdownJogadores(true);
+            renderizarDropdownJogadores();
             return false;
         }
     }
 
-    // Inicializa o carregamento dos dados assim que a página abre
+    // Inicialização ao carregar a página
     carregarDados();
 
     function alterarModoBusca() {
@@ -377,7 +370,7 @@
             }
             titulo.innerText = `Jogadores que pagaram em ${mes} de ${anoSel}:`;
 
-            let jogadoresPagosSet = new Set();
+            let jogadoresPagos = [];
 
             for (let i = 1; i < dadosCache.length; i++) {
                 const row = dadosCache[i];
@@ -386,11 +379,10 @@
                 const anoSheet = row[4] ? row[4].toString().trim() : "";
 
                 if (mesSheet === formatar(mes) && (anoSheet === anoSel || anoSheet === "")) {
-                    if (nomeSheet) jogadoresPagosSet.add(nomeSheet.toString().trim());
+                    if (nomeSheet) jogadoresPagos.push(nomeSheet);
                 }
             }
 
-            let jogadoresPagos = Array.from(jogadoresPagosSet);
             jogadoresPagos.sort((a, b) => a.localeCompare(b, 'pt'));
 
             if (jogadoresPagos.length === 0) {
