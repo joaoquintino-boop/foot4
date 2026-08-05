@@ -179,17 +179,7 @@
         <div class="form-group" id="group-filtro-jogador">
             <label for="filtro-jogador">Escolher Jogador</label>
             <select id="filtro-jogador" onchange="consultar()">
-                <option value="">-- Selecione o Jogador --</option>
-                <option value="Benjamim">Benjamim</option>
-                <option value="Brito">Brito</option>
-                <option value="Bruno">Bruno</option>
-                <option value="David">David</option>
-                <option value="Greg">Greg</option>
-                <option value="Hugo">Hugo</option>
-                <option value="Ideias">Ideias</option>
-                <option value="Rui">Rui</option>
-                <option value="Tiago Xu">Tiago Xu</option>
-                <option value="Zé Prof">Zé Prof</option>
+                <option value="">A carregar jogadores...</option>
             </select>
         </div>
 
@@ -222,9 +212,27 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxSB8DaO_ngTrRbhsjsWU39J8-dBt5ypFgcpVBx6j0fE7lsG0VzNKLvkO5kgwBI34t-/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCJq9LqgVJZgsbHoYxOpIdUVQuHz3ofoDHyeiHKH2QhKvxyGL6pjgLDhClokX9IIUi/exec";
 
     let dadosCache = null;
+
+    // Atualiza a lista de seleção de jogadores ordenando alfabeticamente
+    function atualizarDropdownJogadores(listaJogadores) {
+        const select = document.getElementById('filtro-jogador');
+        if (!select || !listaJogadores || listaJogadores.length === 0) return;
+
+        const valorAtual = select.value;
+
+        // Ordena a lista em ordem alfabética (respeitando acentos em português)
+        listaJogadores.sort((a, b) => a.localeCompare(b, 'pt'));
+
+        select.innerHTML = '<option value="">-- Selecione o Jogador --</option>';
+        listaJogadores.forEach(j => {
+            select.innerHTML += `<option value="${j}">${j}</option>`;
+        });
+
+        if (valorAtual) select.value = valorAtual;
+    }
 
     async function carregarDados() {
         if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("COLE_AQUI")) return false;
@@ -234,7 +242,12 @@
             const resp = await fetch(APPS_SCRIPT_URL);
             if (!resp.ok) throw new Error("Falha na rede");
             const data = await resp.json();
-            // Garante compatibilidade caso o Apps Script devolva o objeto {registos, jogadores}
+            
+            // Popula a lista de jogadores a partir do array global de jogadores
+            if (data.jogadores && Array.isArray(data.jogadores)) {
+                atualizarDropdownJogadores(data.jogadores);
+            }
+
             dadosCache = data.registos ? data.registos : data;
             return true;
         } catch (e) {
@@ -243,7 +256,7 @@
         }
     }
 
-    // Inicia o carregamento logo ao abrir a página
+    // Inicia o carregamento ao abrir a página
     carregarDados();
 
     function alterarModoBusca() {
@@ -293,7 +306,7 @@
         const formatar = (str) => (str || "").toString().trim().toLowerCase();
 
         if (!dadosCache || dadosCache.length <= 1) {
-            conteudo.innerHTML = '<span class="empty-msg">Não há dados registados na folha.</span>';
+            conteudo.innerHTML = '<span class="empty-msg">Não há registos na folha.</span>';
             return;
         }
 
@@ -354,6 +367,8 @@
                     if (nomeSheet) jogadoresPagos.push(nomeSheet);
                 }
             }
+
+            jogadoresPagos.sort((a, b) => a.localeCompare(b, 'pt'));
 
             if (jogadoresPagos.length === 0) {
                 conteudo.innerHTML = `<span class="empty-msg">Nenhum jogador pagou em ${mes} de ${anoSel}.</span>`;
