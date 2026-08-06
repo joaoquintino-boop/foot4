@@ -14,6 +14,7 @@
             --text: #212529;
             --border: #e9ecef;
             --danger: #d90429;
+            --warning: #f59f00;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -31,6 +32,10 @@
         label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: #495057; text-transform: uppercase; }
         select, input, button { width: 100%; padding: 10px 12px; font-size: 0.95rem; border-radius: 8px; border: 1px solid #ced4da; outline: none; }
         
+        .checkbox-container { display: flex; align-items: center; gap: 8px; background: #fff9db; padding: 10px; border-radius: 8px; border: 1px solid #ffe066; margin-top: 6px; }
+        .checkbox-container input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        .checkbox-container label { margin: 0; cursor: pointer; text-transform: none; font-size: 0.85rem; color: #856404; }
+
         .btn-submit { background: var(--primary-light); color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 6px; }
         .btn-toggle { background: #e9ecef; color: var(--primary); border: 1px solid #ced4da; font-weight: 700; cursor: pointer; margin: 16px 0 10px 0; }
         .btn-cancel { background: #6c757d; color: white; border: none; font-weight: 700; cursor: pointer; margin-top: 4px; }
@@ -44,9 +49,9 @@
         .item-actions { display: flex; gap: 6px; }
         .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; width: auto; }
 
-        .status-msg { margin-top: 10px; padding: 10px; border-radius: 6px; font-size: 0.85rem; text-align: center; font-weight: 600; display: none; }
-        .status-success { background: #d8f3dc; color: var(--primary); }
-        .status-error { background: #f8d7da; color: var(--danger); }
+        .status-msg { margin-top: 10px; padding: 12px; border-radius: 8px; font-size: 0.9rem; text-align: center; font-weight: 700; display: none; }
+        .status-success { background: #d8f3dc; color: var(--primary); border: 1px solid #52b788; }
+        .status-error { background: #f8d7da; color: var(--danger); border: 1px solid #f5c6cb; }
         .hidden { display: none !important; }
         .section-title { font-size: 0.85rem; font-weight: 700; color: var(--primary); margin: 10px 0; padding-bottom: 4px; border-bottom: 2px solid var(--accent); text-transform: uppercase; }
         
@@ -103,19 +108,26 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="obs">Observações</label>
-                    <input type="text" id="obs" placeholder="Ex: Pago por MBWay">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="isento">
+                    <label for="isento">🩹 Isento / Não Paga (ex: Lesionado, Ausente)</label>
                 </div>
 
-                <button type="submit" class="btn-submit" id="btn-salvar">✅ Guardar Pagamento</button>
+                <div class="form-group" style="margin-top: 10px;">
+                    <label for="obs">Observações / Motivo</label>
+                    <input type="text" id="obs" placeholder="Ex: Lesão no joelho / MBWay">
+                </div>
+
+                <button type="submit" class="btn-submit" id="btn-salvar">✅ Guardar Registo</button>
                 <button type="button" class="btn-cancel hidden" id="btn-cancelar" onclick="cancelarEdicao()">Cancelar Edição</button>
             </form>
+
+            <div id="status" class="status-msg"></div>
 
             <!-- BOTÃO PARA EXIBIR/OCULTAR HISTÓRICO -->
             <button class="btn-toggle" onclick="alternarHistorico()">👁️ Mostrar / Ocultar Histórico & Edição</button>
 
-            <!-- PAINEL DE HISTÓRICO E FILTROS (INICIA ESCONDIDO) -->
+            <!-- PAINEL DE HISTÓRICO E FILTROS -->
             <div id="area-historico" class="hidden">
                 <div class="section-title">🔍 Pesquisar / Filtrar Registos</div>
                 <div class="filter-box">
@@ -154,8 +166,6 @@
             <div class="section-title">📜 Lista Atual de Jogadores</div>
             <div id="lista-jogadores-gestao">A carregar jogadores...</div>
         </div>
-
-        <div id="status" class="status-msg"></div>
     </div>
 </div>
 
@@ -180,11 +190,9 @@
         }
     }
 
-    // FUNÇÃO QUE PREENCHE OS DROPDOWNS COM A LISTA DE JOGADORES
     function preencherDropdownsJogadores(listaJogadores) {
         if (!listaJogadores || listaJogadores.length === 0) return;
-// 🔤 Ordena a lista de jogadores por ordem alfabética
-    listaJogadores.sort((a, b) => a.localeCompare(b, 'pt'));
+        listaJogadores.sort((a, b) => a.localeCompare(b, 'pt'));
 
         const selJog = document.getElementById('jogador');
         const valorAtual = selJog.value;
@@ -204,26 +212,34 @@
         if (valorFiltroAtual) selFiltroJog.value = valorFiltroAtual;
     }
 
-    // CARREGAR DADOS (COM CACHE LOCAL INSTANTÂNEA)
     async function carregarTudo() {
-        // 1. CARREGAR INSTANTANEAMENTE DA CACHE LOCAL (0 SEGUNDOS)
         const cacheJogadores = localStorage.getItem('cache_jogadores');
+        const cacheRegistos = localStorage.getItem('cache_registos');
+
         if (cacheJogadores) {
-            try {
-                const listaLocal = JSON.parse(cacheJogadores);
-                preencherDropdownsJogadores(listaLocal);
-            } catch (e) { console.error("Erro na cache local", e); }
+            try { preencherDropdownsJogadores(JSON.parse(cacheJogadores)); } catch (e) {}
         }
 
-        // 2. BUSCAR DADOS AO SERVIDOR EM SEGUNDO PLANO
+        if (cacheRegistos) {
+            try {
+                dadosGlobais = dadosGlobais || {};
+                dadosGlobais.registos = JSON.parse(cacheRegistos);
+                if (cacheJogadores) dadosGlobais.jogadores = JSON.parse(cacheJogadores);
+                renderizarHistorico();
+                renderizarListaJogadores();
+            } catch (e) {}
+        }
+
         try {
             const resp = await fetch(APPS_SCRIPT_URL);
             dadosGlobais = await resp.json();
             
             if (dadosGlobais.jogadores) {
                 preencherDropdownsJogadores(dadosGlobais.jogadores);
-                // Atualizar cache
                 localStorage.setItem('cache_jogadores', JSON.stringify(dadosGlobais.jogadores));
+            }
+            if (dadosGlobais.registos) {
+                localStorage.setItem('cache_registos', JSON.stringify(dadosGlobais.registos));
             }
 
             renderizarHistorico();
@@ -238,7 +254,6 @@
 
     carregarTudo();
 
-    // GUARDAR OU EDITAR PAGAMENTO
     async function guardarPagamento(e) {
         e.preventDefault();
         
@@ -246,7 +261,12 @@
         const ano = document.getElementById('ano').value.toString().trim();
         const jogador = document.getElementById('jogador').value.toString().trim();
         const mes = document.getElementById('mes').value.toString().trim();
-        const obs = document.getElementById('obs').value.toString().trim();
+        const eIsento = document.getElementById('isento').checked;
+        let obs = document.getElementById('obs').value.toString().trim();
+
+        if (eIsento) {
+            obs = `[ISENTO] ${obs}`.trim();
+        }
 
         // VALIDAR DUPLICADO
         if (dadosGlobais && dadosGlobais.registos) {
@@ -261,7 +281,7 @@
                 const rAno = (r[4] || "2026").toString().trim();
 
                 if (rJogador === jogador.toLowerCase() && rMes === mes.toLowerCase() && rAno === ano) {
-                    mostrarStatus(`⚠️ O jogador ${jogador} JÁ tem o mês de ${mes}/${ano} pago!`, true);
+                    mostrarStatus(`⚠️ O jogador ${jogador} já tem o mês de ${mes}/${ano} registado!`, true);
                     return;
                 }
             }
@@ -279,16 +299,13 @@
             obs: obs
         };
 
-        // 1. Guardar no Google Sheets
         await postData(payload);
         
-        mostrarStatus(linhaEdicao ? "✏️ Pagamento alterado!" : "✅ Pagamento guardado!");
+        mostrarStatus(linhaEdicao ? "✏️ Registo alterado com sucesso!" : "✅ Registo guardado com sucesso!");
 
-        // 2. Abrir o WhatsApp para partilhar no Grupo (Apenas em novos registos)
         if (!linhaEdicao) {
-            const mensagem = `Recebido ${jogador} - ${mes}/${ano}`;
+            const mensagem = eIsento ? `Isento: ${jogador} - ${mes}/${ano} (${obs.replace('[ISENTO]', '').trim()})` : `Recebido ${jogador} - ${mes}/${ano}`;
             const urlWhatsapp = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensagem)}`;
-            
             window.open(urlWhatsapp, '_blank');
         }
 
@@ -304,11 +321,14 @@
         document.getElementById('ano').value = ano;
         document.getElementById('jogador').value = jog;
         document.getElementById('mes').value = mes;
-        document.getElementById('obs').value = obs;
+
+        const eIsento = obs.includes('[ISENTO]');
+        document.getElementById('isento').checked = eIsento;
+        document.getElementById('obs').value = obs.replace(/\[ISENTO\]\s*/gi, '');
 
         document.getElementById('banner-edicao').classList.remove('hidden');
         document.getElementById('btn-cancelar').classList.remove('hidden');
-        document.getElementById('btn-salvar').innerText = "🔄 Atualizar Pagamento";
+        document.getElementById('btn-salvar').innerText = "🔄 Atualizar Registo";
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -316,9 +336,10 @@
     function cancelarEdicao() {
         document.getElementById('linha-edicao-id').value = "";
         document.getElementById('obs').value = "";
+        document.getElementById('isento').checked = false;
         document.getElementById('banner-edicao').classList.add('hidden');
         document.getElementById('btn-cancelar').classList.add('hidden');
-        document.getElementById('btn-salvar').innerText = "✅ Guardar Pagamento";
+        document.getElementById('btn-salvar').innerText = "✅ Guardar Registo";
     }
 
     async function eliminarPagamento(linha) {
@@ -329,7 +350,6 @@
         }
     }
 
-    // RENDERIZAR HISTÓRICO COM FILTROS
     function renderizarHistorico() {
         const cont = document.getElementById('lista-historico');
         if (!dadosGlobais || !dadosGlobais.registos || dadosGlobais.registos.length <= 1) {
@@ -353,19 +373,21 @@
             const anoReg = (r[4] || "2026").toString();
             const obsReg = (r[3] || "").toString();
 
-            // Aplicação dos Filtros
             if (fJogador && jogReg.toLowerCase() !== fJogador) continue;
             if (fMes && mesReg.toLowerCase() !== fMes) continue;
             if (fAno && anoReg !== fAno) continue;
 
             encontrados++;
 
+            const eIsento = obsReg.includes('[ISENTO]');
+            const obsLimpa = obsReg.replace(/\[ISENTO\]\s*/gi, '');
+
             const div = document.createElement('div');
             div.className = 'item-row';
             div.innerHTML = `
                 <div class="item-info">
-                    <b>${jogReg}</b><br>
-                    <small>${mesReg} / ${anoReg} ${obsReg ? '- <i>'+obsReg+'</i>' : ''}</small>
+                    <b>${jogReg}</b> ${eIsento ? '🩹 <span style="color:#856404; font-size:0.75rem;">(ISENTO)</span>' : ''}<br>
+                    <small>${mesReg} / ${anoReg} ${obsLimpa ? '- <i>'+obsLimpa+'</i>' : ''}</small>
                 </div>
                 <div class="item-actions">
                     <button class="btn-submit btn-sm" onclick="prepararEdicao(${linhaReal}, '${jogReg}', '${mesReg}', '${anoReg}', '${obsReg}')">✏️ Editar</button>
@@ -432,7 +454,8 @@
         s.className = 'status-msg ' + (eErro ? 'status-error' : 'status-success');
         s.innerText = msg;
         s.style.display = 'block';
-        setTimeout(() => s.style.display = 'none', 3500);
+        s.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        setTimeout(() => s.style.display = 'none', 4500);
     }
 </script>
 
