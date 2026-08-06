@@ -15,12 +15,24 @@
             --border: #e9ecef;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 12px; display: flex; justify-content: center; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+        }
 
         .container {
             width: 100%;
-            max-width: 460px;
+            max-width: 440px;
             background: var(--card-bg);
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
@@ -28,66 +40,114 @@
             border: 1px solid var(--border);
         }
 
-        .header { background: var(--primary); color: white; padding: 20px 16px; text-align: center; }
-        .header h1 { font-size: 1.25rem; font-weight: 700; }
-        .header p { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+        }
 
-        .content { padding: 16px; }
-        .form-group { margin-bottom: 14px; }
-        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; color: #495057; text-transform: uppercase; }
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .content {
+            padding: 20px 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
         select {
             width: 100%;
-            padding: 10px 12px;
-            font-size: 0.95rem;
-            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border-radius: 10px;
             border: 1px solid #ced4da;
             outline: none;
             background-color: #fff;
         }
 
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.25);
+        }
+
         .result-card {
-            background: #f8f9fa;
-            border-top: 3px solid var(--accent);
-            padding: 14px;
+            background: #f1f8f5;
+            border-left: 4px solid var(--accent);
+            padding: 16px;
             border-radius: 10px;
-            margin-top: 14px;
+            margin-top: 16px;
             min-height: 100px;
         }
 
-        .result-title { font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
-
-        .list-container { display: flex; flex-direction: column; gap: 8px; }
-
-        .list-item {
-            background: #ffffff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        .result-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
         }
 
-        .item-main { display: flex; align-items: center; gap: 10px; }
-        .item-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-        .item-obs { font-size: 0.78rem; color: #6c757d; font-style: italic; text-align: right; max-width: 45%; word-break: break-word; }
+        .badge-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
 
         .badge {
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            white-space: nowrap;
+            background: var(--accent);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
-        .badge-pago { background: #d8f3dc; color: #1b4332; }
-        .badge-isento { background: #fff3bf; color: #856404; }
-        .badge-falta { background: #ffe3e3; color: #c92a2a; }
+        .badge-obs {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            font-weight: normal;
+        }
 
-        .empty-msg { color: #6c757d; font-size: 0.85rem; font-style: italic; }
-        .hidden { display: none !important; }
+        .empty-msg {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 10px;
+            color: var(--primary-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -95,7 +155,7 @@
 <div class="container">
     <div class="header">
         <h1>Pagamentos foot4</h1>
-        <p>Consulta em Tempo Real</p>
+        <p>Consulta</p>
     </div>
 
     <div class="content">
@@ -111,15 +171,15 @@
         <div class="form-group">
             <label for="busca-tipo">Modo de Consulta</label>
             <select id="busca-tipo" onchange="alterarModoBusca()">
-                <option value="jogador" selected>Por Jogador (Ver Meses)</option>
-                <option value="mes">Por Mês (Ver Lista Completa)</option>
+                <option value="jogador" selected>Por Jogador (Ver Meses Pagos)</option>
+                <option value="mes">Por Mês (Ver Quem Pagou)</option>
             </select>
         </div>
 
         <div class="form-group" id="group-filtro-jogador">
             <label for="filtro-jogador">Escolher Jogador</label>
             <select id="filtro-jogador" onchange="consultar()">
-                <option value="">A carregar jogadores...</option>
+                <option value="">⏳ A carregar jogadores...</option>
             </select>
         </div>
 
@@ -127,18 +187,24 @@
             <label for="filtro-mes">Escolher Mês</label>
             <select id="filtro-mes" onchange="consultar()">
                 <option value="">-- Selecione o Mês --</option>
-                <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
-                <option value="Março">Março</option><option value="Abril">Abril</option>
-                <option value="Maio">Maio</option><option value="Junho">Junho</option>
-                <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
-                <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
-                <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                <option value="Janeiro">Janeiro</option>
+                <option value="Fevereiro">Fevereiro</option>
+                <option value="Março">Março</option>
+                <option value="Abril">Abril</option>
+                <option value="Maio">Maio</option>
+                <option value="Junho">Junho</option>
+                <option value="Julho">Julho</option>
+                <option value="Agosto">Agosto</option>
+                <option value="Setembro">Setembro</option>
+                <option value="Outubro">Outubro</option>
+                <option value="Novembro">Novembro</option>
+                <option value="Dezembro">Dezembro</option>
             </select>
         </div>
 
         <div class="result-card">
             <div class="result-title" id="resultado-titulo">Selecione uma opção acima</div>
-            <div id="resultado-conteudo" class="list-container">
+            <div id="resultado-conteudo" class="badge-list">
                 <span class="empty-msg">A aguardar seleção...</span>
             </div>
         </div>
@@ -146,68 +212,129 @@
 </div>
 
 <script>
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCJq9LqgVJZgsbHoYxOpIdUVQuHz3ofoDHyeiHKH2QhKvxyGL6pjgLDhClokX9IIUi/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyenz_4qBYAiy3UK_4jWk7cBPMmHzffl-AbufDAnBPUq5Vk5J7QzNXEuuUK1T14tVFy/exec";
 
     let dadosCache = null;
-    let listaJogadoresGlobais = [];
+    let jogadoresGlobais = [];
+    let valorSemanalGlobal = 5; // Valor por defeito
 
-    function atualizarDropdownJogadores(lista) {
+    // Função para contar quantas quartas-feiras tem um mês específico
+    function contarQuartasFeiras(ano, nomeMes) {
+        const meses = [
+            "janeiro", "fevereiro", "março", "abril", "maio", "junho", 
+            "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+        ];
+        
+        const numAno = parseInt(ano, 10);
+        const idxMes = meses.indexOf((nomeMes || "").toString().trim().toLowerCase());
+        
+        if (idxMes === -1 || isNaN(numAno)) return 0;
+
+        let quantidadeQuartas = 0;
+        let data = new Date(numAno, idxMes, 1);
+
+        while (data.getMonth() === idxMes) {
+            if (data.getDay() === 3) { // 3 = Quarta-feira
+                quantidadeQuartas++;
+            }
+            data.setDate(data.getDate() + 1);
+        }
+
+        return quantidadeQuartas;
+    }
+
+    // Callback JSONP ao receber os dados do Apps Script
+    window.receberDadosAppsScript = function(data) {
+        if (!data) {
+            renderizarDropdownJogadores(true);
+            return;
+        }
+
+        const registos = data.registos ? data.registos : (Array.isArray(data) ? data : []);
+        dadosCache = registos;
+
+        if (data.valorSemanal) {
+            valorSemanalGlobal = parseFloat(data.valorSemanal);
+        }
+
+        if (data.jogadores && Array.isArray(data.jogadores)) {
+            jogadoresGlobais = jogadoresGlobais.concat(data.jogadores);
+        }
+
+        for (let i = 1; i < registos.length; i++) {
+            if (registos[i][1]) jogadoresGlobais.push(registos[i][1]);
+        }
+
+        renderizarDropdownJogadores();
+
+        const jog = document.getElementById('filtro-jogador').value;
+        const mes = document.getElementById('filtro-mes').value;
+        if (jog || mes) {
+            consultar();
+        } else {
+            document.getElementById('resultado-titulo').innerText = "Selecione uma opção acima";
+            document.getElementById('resultado-conteudo').innerHTML = '<span class="empty-msg">A aguardar seleção...</span>';
+        }
+    };
+
+    function renderizarDropdownJogadores(erro = false) {
         const select = document.getElementById('filtro-jogador');
-        if (!select || !lista || lista.length === 0) return;
+        if (!select) return;
+
+        if (erro) {
+            select.innerHTML = '<option value="">❌ Erro ao carregar jogadores</option>';
+            document.getElementById('resultado-titulo').innerText = 'Erro de Ligação';
+            document.getElementById('resultado-conteudo').innerHTML = '<span class="empty-msg" style="color:#d90429;">Não foi possível carregar os dados.</span>';
+            return;
+        }
 
         const valorAtual = select.value;
-        listaJogadoresGlobais = [...lista].sort((a, b) => a.localeCompare(b, 'pt'));
+
+        const unicos = [...new Set(jogadoresGlobais)]
+            .map(j => (j || "").toString().trim())
+            .filter(j => j !== "");
+
+        unicos.sort((a, b) => a.localeCompare(b, 'pt'));
 
         select.innerHTML = '<option value="">-- Selecione o Jogador --</option>';
-        listaJogadoresGlobais.forEach(j => {
+        unicos.forEach(j => {
             select.innerHTML += `<option value="${j}">${j}</option>`;
         });
 
-        if (valorAtual) select.value = valorAtual;
+        if (valorAtual && unicos.includes(valorAtual)) {
+            select.value = valorAtual;
+        }
     }
 
-    async function carregarDados() {
+    function carregarDados() {
         if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("COLE_AQUI")) return;
 
-        const cacheJog = localStorage.getItem('cache_jogadores');
-        const cacheReg = localStorage.getItem('cache_registos');
-
-        if (cacheJog) {
-            try { atualizarDropdownJogadores(JSON.parse(cacheJog)); } catch(e){}
-        }
-        if (cacheReg) {
-            try { dadosCache = JSON.parse(cacheReg); } catch(e){}
-        }
-
-        if (dadosCache) consultar();
-
-        try {
-            const resp = await fetch(APPS_SCRIPT_URL);
-            const data = await resp.json();
-            
-            if (data.jogadores && Array.isArray(data.jogadores)) {
-                atualizarDropdownJogadores(data.jogadores);
-                localStorage.setItem('cache_jogadores', JSON.stringify(data.jogadores));
-            }
-
-            dadosCache = data.registos ? data.registos : data;
-            localStorage.setItem('cache_registos', JSON.stringify(dadosCache));
-            
-            consultar();
-        } catch (e) {
-            console.error("Erro na atualização do servidor:", e);
-        }
+        const script = document.createElement('script');
+        script.src = `${APPS_SCRIPT_URL}?prefix=receberDadosAppsScript`;
+        script.onerror = function() {
+            renderizarDropdownJogadores(true);
+        };
+        document.body.appendChild(script);
     }
 
     carregarDados();
 
     function alterarModoBusca() {
         const modo = document.getElementById('busca-tipo').value;
-        document.getElementById('group-filtro-jogador').classList.toggle('hidden', modo !== 'jogador');
-        document.getElementById('group-filtro-mes').classList.toggle('hidden', modo !== 'mes');
+        const groupJog = document.getElementById('group-filtro-jogador');
+        const groupMes = document.getElementById('group-filtro-mes');
         
         document.getElementById('filtro-jogador').value = "";
         document.getElementById('filtro-mes').value = "";
+
+        if (modo === 'jogador') {
+            groupJog.classList.remove('hidden');
+            groupMes.classList.add('hidden');
+        } else {
+            groupJog.classList.add('hidden');
+            groupMes.classList.remove('hidden');
+        }
+        
         consultar();
     }
 
@@ -218,11 +345,16 @@
         const conteudo = document.getElementById('resultado-conteudo');
         
         conteudo.innerHTML = '';
+
+        if (!dadosCache) {
+            conteudo.innerHTML = '<span class="loading">⏳ A carregar dados...</span>';
+            return;
+        }
+
         const formatar = (str) => (str || "").toString().trim().toLowerCase();
 
         if (!dadosCache || dadosCache.length <= 1) {
-            titulo.innerText = 'Informação';
-            conteudo.innerHTML = '<span class="empty-msg">A carregar dados...</span>';
+            conteudo.innerHTML = '<span class="empty-msg">Não há registos na folha.</span>';
             return;
         }
 
@@ -233,7 +365,7 @@
                 conteudo.innerHTML = '<span class="empty-msg">Escolha o jogador na lista acima.</span>';
                 return;
             }
-            titulo.innerText = `Histórico de ${jog} em ${anoSel}:`;
+            titulo.innerText = `Meses pagos por ${jog} em ${anoSel}:`;
 
             let resultados = [];
 
@@ -250,22 +382,18 @@
             }
 
             if (resultados.length === 0) {
-                conteudo.innerHTML = `<span class="empty-msg">Sem registos para ${anoSel}.</span>`;
+                conteudo.innerHTML = `<span class="empty-msg">Sem pagamentos registados para ${anoSel}.</span>`;
             } else {
                 resultados.forEach(r => {
-                    const eIsento = r.obs.includes('[ISENTO]');
-                    const obsLimpa = r.obs.replace(/\[ISENTO\]\s*/gi, '').trim();
+                    const numQuartas = contarQuartasFeiras(anoSel, r.mes);
+                    const totalCalculado = numQuartas * valorSemanalGlobal;
 
-                    const item = document.createElement('div');
-                    item.className = 'list-item';
-                    item.innerHTML = `
-                        <div class="item-main">
-                            <span class="badge ${eIsento ? 'badge-isento' : 'badge-pago'}">${eIsento ? '🩹 Isento' : '✅ Pago'}</span>
-                            <span class="item-title">${r.mes}</span>
-                        </div>
-                        <div class="item-obs">${obsLimpa ? obsLimpa : ''}</div>
-                    `;
-                    conteudo.appendChild(item);
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    let txt = `✅ ${r.mes} (${totalCalculado}€)`;
+                    if (r.obs) txt += ` <span class="badge-obs">(${r.obs})</span>`;
+                    badge.innerHTML = txt;
+                    conteudo.appendChild(badge);
                 });
             }
 
@@ -276,62 +404,36 @@
                 conteudo.innerHTML = '<span class="empty-msg">Escolha o mês na lista acima.</span>';
                 return;
             }
-            titulo.innerText = `Estado das cotas em ${mes} de ${anoSel}:`;
 
-            let mapaEstado = {};
+            const numQuartas = contarQuartasFeiras(anoSel, mes);
+            const totalCalculado = numQuartas * valorSemanalGlobal;
+
+            titulo.innerText = `Pagamentos em ${mes} de ${anoSel} (${totalCalculado}€ / jogador):`;
+
+            let jogadoresPagosSet = new Set();
 
             for (let i = 1; i < dadosCache.length; i++) {
                 const row = dadosCache[i];
                 const nomeSheet = row[1];
                 const mesSheet = formatar(row[2]);
-                const obsSheet = row[3] || "";
                 const anoSheet = row[4] ? row[4].toString().trim() : "";
 
                 if (mesSheet === formatar(mes) && (anoSheet === anoSel || anoSheet === "")) {
-                    if (nomeSheet) {
-                        mapaEstado[formatar(nomeSheet)] = {
-                            nomeOriginal: nomeSheet,
-                            obs: obsSheet,
-                            isento: obsSheet.includes('[ISENTO]')
-                        };
-                    }
+                    if (nomeSheet) jogadoresPagosSet.add(nomeSheet.toString().trim());
                 }
             }
 
-            let listaParaExibir = [...listaJogadoresGlobais];
-            if (listaParaExibir.length === 0) {
-                const extraidos = new Set();
-                for (let i = 1; i < dadosCache.length; i++) if (dadosCache[i][1]) extraidos.add(dadosCache[i][1].toString().trim());
-                listaParaExibir = Array.from(extraidos).sort((a,b) => a.localeCompare(b, 'pt'));
-            }
+            let jogadoresPagos = Array.from(jogadoresPagosSet);
+            jogadoresPagos.sort((a, b) => a.localeCompare(b, 'pt'));
 
-            if (listaParaExibir.length === 0) {
-                conteudo.innerHTML = `<span class="empty-msg">Nenhum jogador encontrado.</span>`;
+            if (jogadoresPagos.length === 0) {
+                conteudo.innerHTML = `<span class="empty-msg">Nenhum jogador pagou em ${mes} de ${anoSel}.</span>`;
             } else {
-                listaParaExibir.forEach(j => {
-                    const info = mapaEstado[formatar(j)];
-                    const item = document.createElement('div');
-                    item.className = 'list-item';
-
-                    if (info) {
-                        const obsLimpa = info.obs.replace(/\[ISENTO\]\s*/gi, '').trim();
-                        item.innerHTML = `
-                            <div class="item-main">
-                                <span class="badge ${info.isento ? 'badge-isento' : 'badge-pago'}">${info.isento ? '🩹 Isento' : '✅ Pago'}</span>
-                                <span class="item-title">${j}</span>
-                            </div>
-                            <div class="item-obs">${obsLimpa ? obsLimpa : ''}</div>
-                        `;
-                    } else {
-                        item.innerHTML = `
-                            <div class="item-main">
-                                <span class="badge badge-falta">❌ Em falta</span>
-                                <span class="item-title">${j}</span>
-                            </div>
-                            <div class="item-obs"></div>
-                        `;
-                    }
-                    conteudo.appendChild(item);
+                jogadoresPagos.forEach(j => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.innerText = `👤 ${j}`;
+                    conteudo.appendChild(badge);
                 });
             }
         }
